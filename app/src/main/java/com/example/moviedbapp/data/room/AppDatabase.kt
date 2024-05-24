@@ -10,6 +10,27 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun profileDao() : ProfileDao
     abstract fun watchItemDao() : WatchItemDao
     abstract fun movieDao() : MovieDao
-}
 
-fun getDb(appContext : Context) = Room.databaseBuilder(appContext, AppDatabase::class.java, "app-database" ).build()
+    companion object {
+        @Volatile
+        private var INSTANCE: AppDatabase? = null
+        fun getInstance(context: Context): AppDatabase {
+            // only one thread of execution at a time can enter this block of code
+            synchronized(this) {
+                var instance = INSTANCE
+
+                if (instance == null) {
+                    instance = Room.databaseBuilder(
+                        context.applicationContext,
+                        AppDatabase::class.java,
+                        "app-database"
+                    ).fallbackToDestructiveMigration()
+                        .build()
+
+                    INSTANCE = instance
+                }
+                return instance
+            }
+        }
+    }
+}

@@ -5,17 +5,19 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import androidx.room.Relation
+import java.util.UUID
 
-@Entity(tableName = "profile")
+@Entity(tableName = "profile",)
 data class Profile(
-    @PrimaryKey val id: Int,
-    val name: String
+    val name: String,
+    var selected : Boolean = false,
+    @PrimaryKey val id: UUID = UUID.randomUUID(),
 )
 
 @Entity(tableName = "movie")
 data class Movie(
-    @PrimaryKey val id: Int,
-    val name: String
+    val name: String,
+    @PrimaryKey val id: UUID = UUID.randomUUID(),
 )
 @Entity(
     tableName = "watchItem",
@@ -30,9 +32,9 @@ data class Movie(
     )]
 )
 data class WatchItem(
-    @PrimaryKey val id: Int,
-    val profileId: Int,
-    val movieId: Int
+    val profileId : UUID,
+    val movieId: UUID,
+    @PrimaryKey val id: UUID = UUID.randomUUID(),
 )
 
 data class ProfileAndWatchList(

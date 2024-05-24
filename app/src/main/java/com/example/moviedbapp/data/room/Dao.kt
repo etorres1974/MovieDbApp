@@ -3,30 +3,50 @@ package com.example.moviedbapp.data.room
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Transaction
+import kotlinx.coroutines.flow.Flow
+import java.util.UUID
 
 @Dao
 abstract class ProfileDao : BaseDao<Profile>{
 
     @Query("Select * FROM profile")
-    abstract fun getAll() : List<Profile>
+    abstract fun getAll() : Flow<List<Profile>>
+
+    @Query("Select * FROM profile where selected = true")
+    abstract fun getSelected() : List<Profile>
+    @Transaction
+    @Query("Select * FROM profile  where selected = true")
+    abstract fun getSelectedFullProfile() : Flow<List<ProfileAndWatchList>>
+
     @Query("Select * FROM profile WHERE id = :id")
-    abstract fun getById(id : Int) : List<Profile>
+    abstract fun getById(id : UUID) : List<Profile>
     @Transaction
     @Query("Select * FROM profile WHERE id = :id")
-    abstract fun getFullProfileById(id : Int) : List<ProfileAndWatchList>
+    abstract fun getFullProfileById(id : UUID) : List<ProfileAndWatchList>
+
+}
+
+@Transaction
+suspend inline fun ProfileDao.selectProfile(profile : Profile) {
+    getSelected().firstOrNull()?.let {
+        it.selected = false
+        update(it)
+    }
+    profile.selected = true
+    update(profile)
 }
 
 @Dao
 abstract class WatchItemDao : BaseDao<WatchItem>{
     @Query("SELECT * FROM  watchItem")
-    abstract fun getAllWatchItens() : List<WatchItem>
+    abstract fun getAllWatchItens() : Flow<List<WatchItem>>
 
     @Query("Select * FROM watchItem WHERE id = :id")
-    abstract fun getById(id : Int) : List<WatchItem>
+    abstract fun getById(id : UUID) : List<WatchItem>
 }
 
 @Dao
 abstract class MovieDao : BaseDao<Movie>{
     @Query("SELECT * FROM movie")
-    abstract fun getAll() : List<Movie>
+    abstract fun getAll() : Flow<List<Movie>>
 }
