@@ -38,4 +38,9 @@ class ProfileRepoImplementation(
         }
     }
 
+    override suspend fun deleteProfile(profile: Profile) {
+        withContext(dispatcher){
+            profileDao.delete(profile)
+        }
+    }
 }

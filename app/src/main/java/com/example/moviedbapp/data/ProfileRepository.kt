@@ -12,4 +12,5 @@ interface ProfileRepository {
     suspend fun addProfile(name : String)
     suspend fun selectProfile(profile: Profile)
     suspend fun addMovieToWatchList(movie : Movie)
+    suspend fun deleteProfile(profile: Profile)
 }
