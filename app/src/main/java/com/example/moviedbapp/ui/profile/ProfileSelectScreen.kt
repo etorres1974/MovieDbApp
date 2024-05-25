@@ -47,13 +47,19 @@ import com.example.moviedbapp.ui.application.AppViewModelProvider
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 
+interface ProfileSelectNavigator{
+    fun logout()
+    fun home()
+}
+
 @Composable
 fun ProfileSelectScreen(
+    navigator : ProfileSelectNavigator,
     modifier: Modifier = Modifier,
     viewModel: ProfileViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val homeUiState by viewModel.homeUiStateStateFlow.collectAsState()
-    ProfileSelectScreenContent(homeUiState = homeUiState, modifier)
+    ProfileSelectScreenContent(homeUiState = homeUiState, navigator, modifier)
 }
 
 @Preview(showBackground = true)
@@ -63,12 +69,12 @@ fun ProfileSelectScreenPreview(modifier: Modifier = Modifier){
         profiles = listOf(Profile("name", true), Profile("name", false)),
 
     )
-    ProfileSelectScreenContent(homeUiState = previewState, modifier)
+    ProfileSelectScreenContent(homeUiState = previewState, null, modifier)
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ProfileSelectScreenContent(homeUiState: HomeUiState, modifier: Modifier = Modifier){
+fun ProfileSelectScreenContent(homeUiState: HomeUiState,  navigator : ProfileSelectNavigator? = null, modifier: Modifier = Modifier){
     val context = LocalContext.current
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -118,7 +124,7 @@ fun ProfileSelectScreenContent(homeUiState: HomeUiState, modifier: Modifier = Mo
                     modifier = Modifier.padding(4.dp),
                     onClick = {
                         homeUiState.selectProfile(uiSelected)
-                    uiSelectedProfile = null
+                        navigator?.home()
                 }) {
                     Text(text = "Enter Profile")
                 }

@@ -20,20 +20,22 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.moviedbapp.ui.application.AppViewModelProvider
 
-
+interface LoginNavigator{
+    fun toProfiles()
+}
 @Composable
-fun LoginScreen(userViewModel: UserViewModel = viewModel(factory = AppViewModelProvider.Factory),   modifier: Modifier = Modifier){
-    LoginContent(LoginUiState(), modifier)
+fun LoginScreen(navigator : LoginNavigator, modifier: Modifier = Modifier, userViewModel: UserViewModel = viewModel(factory = AppViewModelProvider.Factory)){
+    LoginContent(LoginUiState(),  modifier, navigator)
 }
 
 @Composable
 @Preview(showBackground = true)
 fun PreviewLoginScreen(modifier: Modifier = Modifier){
-    LoginContent(loginUiState = LoginUiState(), modifier)
+    LoginContent(LoginUiState(), modifier, null)
 }
 
 @Composable
-fun LoginContent(loginUiState: LoginUiState, modifier: Modifier = Modifier, ){
+fun LoginContent(loginUiState: LoginUiState, modifier: Modifier = Modifier,  navigator : LoginNavigator? = null){
     var email by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
 
@@ -41,7 +43,6 @@ fun LoginContent(loginUiState: LoginUiState, modifier: Modifier = Modifier, ){
         modifier = modifier.padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Text(text = "Login", style = MaterialTheme.typography.displayMedium)
 
         OutlinedTextField(
             value = email,
@@ -57,7 +58,10 @@ fun LoginContent(loginUiState: LoginUiState, modifier: Modifier = Modifier, ){
             modifier = Modifier.fillMaxWidth()
         )
         Button(
-            onClick = { loginUiState.onLoginClick(email, password) },
+            onClick = {
+                loginUiState.onLoginClick(email, password)
+                navigator?.toProfiles()
+            },
             modifier = Modifier.align(Alignment.End)
         ) {
             Text(text = "Login")

@@ -12,7 +12,11 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import com.example.moviedbapp.ui.home.HomeScreenPreview
 import com.example.moviedbapp.ui.login.PreviewLoginScreen
+import com.example.moviedbapp.ui.navigation.AppNavHost
 import com.example.moviedbapp.ui.profile.ProfileSelectScreen
 import com.example.moviedbapp.ui.profile.ProfileSelectScreenPreview
 import com.example.moviedbapp.ui.theme.MovieDbAppTheme
@@ -21,31 +25,38 @@ import com.example.moviedbapp.ui.theme.MovieDbAppTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContent {
-            AppContentHolder{  innerPadding ->
-                ProfileSelectScreen(modifier = Modifier.padding(innerPadding))
+            val hostNavController = rememberNavController()
+            AppContentHolder(hostNavController){  innerPadding ->
+                AppNavHost(
+                    navHostController =  hostNavController,
+                    modifier = Modifier.padding(innerPadding))
             }
         }
     }
 }
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppContentHolder( content : @Composable (PaddingValues) -> Unit){
+fun AppContentHolder(hostNavController: NavHostController? = null, content : @Composable (PaddingValues) -> Unit){
     MovieDbAppTheme {
-        val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
         Scaffold(
             modifier = Modifier.fillMaxSize(),
             topBar = {
-                TopAppBar(
-                    title = "Home",
-                    canNavigateBack = false,
-                    scrollBehavior = scrollBehavior
-                )
+                hostNavController?.let{
+                    TopAppBar(hostNavController = hostNavController)
+                }
             },
         ) { innerPadding ->
            content(innerPadding)
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun AppLoginPreview() {
+    AppContentHolder { innerPadding ->
+        PreviewLoginScreen(modifier = Modifier.padding(innerPadding))
     }
 }
 
@@ -59,8 +70,8 @@ fun AppPreview() {
 
 @Preview(showBackground = true)
 @Composable
-fun AppLoginPreview() {
+fun AppHomePreview(){
     AppContentHolder { innerPadding ->
-        PreviewLoginScreen(modifier = Modifier.padding(innerPadding))
+        HomeScreenPreview(modifier = Modifier.padding(innerPadding))
     }
 }

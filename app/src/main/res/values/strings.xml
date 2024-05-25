@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">MovieDbApp</string>
+    <string name="loginTitle">Login</string>
+    <string name="profileSelectTitle">Select Profile</string>
+    <string name="homeTitle">Home</string>
+    <string name="notFound">Not Found</string>
 </resources>
