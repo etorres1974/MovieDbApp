@@ -1,6 +1,6 @@
 package com.example.moviedbapp.data.impRepo
 
-import com.example.moviedbapp.data.ProfileRepository
+import com.example.moviedbapp.domain.ProfileRepository
 import com.example.moviedbapp.data.room.Movie
 import com.example.moviedbapp.data.room.Profile
 import com.example.moviedbapp.data.room.ProfileDao

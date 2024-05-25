@@ -1,4 +1,4 @@
-package com.example.moviedbapp.ui
+package com.example.moviedbapp.ui.application
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack

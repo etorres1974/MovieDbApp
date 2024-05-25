@@ -1,4 +1,4 @@
-package com.example.moviedbapp.data
+package com.example.moviedbapp.domain
 
 import com.example.moviedbapp.data.room.Movie
 import com.example.moviedbapp.data.room.Profile

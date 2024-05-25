@@ -1,9 +1,11 @@
-package com.example.moviedbapp.ui
+package com.example.moviedbapp.ui.application
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory
 import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.moviedbapp.MovieApplication
+import com.example.moviedbapp.ui.login.UserViewModel
+import com.example.moviedbapp.ui.profile.ProfileViewModel
 
 object AppViewModelProvider {
     val Factory = viewModelFactory {
@@ -11,6 +13,9 @@ object AppViewModelProvider {
         // Initializer for HomeViewModel
         initializer {
             ProfileViewModel(movieApplication().container.profileRepository)
+        }
+        initializer {
+            UserViewModel(movieApplication().container.userRepository)
         }
     }
 }

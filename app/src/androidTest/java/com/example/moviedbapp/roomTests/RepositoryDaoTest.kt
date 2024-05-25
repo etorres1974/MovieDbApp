@@ -5,7 +5,7 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.moviedbapp.data.impRepo.ProfileRepoImplementation
-import com.example.moviedbapp.data.ProfileRepository
+import com.example.moviedbapp.domain.ProfileRepository
 import com.example.moviedbapp.data.room.AppDatabase
 import com.example.moviedbapp.data.room.Movie
 import com.example.moviedbapp.data.room.MovieDao

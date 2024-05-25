@@ -1,4 +1,4 @@
-package com.example.moviedbapp
+package com.example.moviedbapp.ui.application
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -12,9 +12,9 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.moviedbapp.ui.ProfileSelectScreen
-import com.example.moviedbapp.ui.ProfileSelectScreenPreview
-import com.example.moviedbapp.ui.TopAppBar
+import com.example.moviedbapp.ui.login.PreviewLoginScreen
+import com.example.moviedbapp.ui.profile.ProfileSelectScreen
+import com.example.moviedbapp.ui.profile.ProfileSelectScreenPreview
 import com.example.moviedbapp.ui.theme.MovieDbAppTheme
 
 
@@ -54,5 +54,13 @@ fun AppContentHolder( content : @Composable (PaddingValues) -> Unit){
 fun AppPreview() {
     AppContentHolder { innerPadding ->
         ProfileSelectScreenPreview(modifier = Modifier.padding(innerPadding))
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun AppLoginPreview() {
+    AppContentHolder { innerPadding ->
+        PreviewLoginScreen(modifier = Modifier.padding(innerPadding))
     }
 }

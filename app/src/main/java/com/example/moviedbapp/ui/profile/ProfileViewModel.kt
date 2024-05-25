@@ -1,8 +1,8 @@
-package com.example.moviedbapp.ui
+package com.example.moviedbapp.ui.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.moviedbapp.data.ProfileRepository
+import com.example.moviedbapp.domain.ProfileRepository
 import com.example.moviedbapp.data.room.Profile
 import com.example.moviedbapp.data.room.ProfileAndWatchList
 import kotlinx.coroutines.flow.SharingStarted
