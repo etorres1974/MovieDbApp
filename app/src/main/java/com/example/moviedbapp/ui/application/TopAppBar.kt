@@ -67,7 +67,7 @@ fun TopAppBarContent(modifier: Modifier = Modifier, scrollBehavior: TopAppBarScr
         })
 }
 
-fun String?.toDestination() : NavigationDestination{
+private fun String?.toDestination() : NavigationDestination{
     return when(this){
         LoginDestination.route -> LoginDestination
         ProfileSelectDestination.route -> ProfileSelectDestination
@@ -76,7 +76,7 @@ fun String?.toDestination() : NavigationDestination{
     }
 }
 
-fun NavigationDestination.backBehaviour(navHostController : NavHostController?)  {
+private fun NavigationDestination.backBehaviour(navHostController : NavHostController?)  {
     when(this){
         else -> { navHostController?.navigateUp() }
     }

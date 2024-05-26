@@ -12,7 +12,7 @@ object AppViewModelProvider {
 
         // Initializer for HomeViewModel
         initializer {
-            ProfileViewModel(movieApplication().container.profileRepository)
+            ProfileViewModel(movieApplication().container.profileRepository, movieApplication().container.userRepository)
         }
         initializer {
             UserViewModel(movieApplication().container.userRepository)

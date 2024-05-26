@@ -1,11 +1,13 @@
 package com.example.moviedbapp.data
 
 import android.content.Context
-import com.example.moviedbapp.data.impRepo.LocalUserRepoImplementation
+import com.example.moviedbapp.data.impRepo.FirebaseUserRepoImp
 import com.example.moviedbapp.data.impRepo.ProfileRepoImplementation
 import com.example.moviedbapp.data.room.AppDatabase
 import com.example.moviedbapp.domain.ProfileRepository
 import com.example.moviedbapp.domain.UserRepository
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 
 interface AppContainer {
     val profileRepository : ProfileRepository
@@ -13,11 +15,11 @@ interface AppContainer {
 }
 
 class AppDataContainer(private val context: Context) : AppContainer {
-    val db = AppDatabase.getInstance(context)
+    private val db = AppDatabase.getInstance(context)
     override val profileRepository : ProfileRepository by lazy {
         ProfileRepoImplementation(db.watchItemDao(), db.profileDao())
     }
     override val userRepository: UserRepository by lazy {
-        LocalUserRepoImplementation()
+        FirebaseUserRepoImp(Firebase.auth)
     }
 }

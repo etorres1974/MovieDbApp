@@ -44,56 +44,75 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.moviedbapp.R
 import com.example.moviedbapp.data.room.Profile
 import com.example.moviedbapp.ui.application.AppViewModelProvider
+import com.example.moviedbapp.ui.login.UserViewModel
+import com.google.firebase.firestore.auth.User
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 
-interface ProfileSelectNavigator{
+interface ProfileSelectNavigator {
     fun logout()
     fun home()
 }
 
 @Composable
 fun ProfileSelectScreen(
-    navigator : ProfileSelectNavigator,
+    navigator: ProfileSelectNavigator,
     modifier: Modifier = Modifier,
     viewModel: ProfileViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val homeUiState by viewModel.homeUiStateStateFlow.collectAsState()
-    ProfileSelectScreenContent(homeUiState = homeUiState, navigator, modifier)
+    ProfileSelectScreenContent(homeUiState = homeUiState, modifier, navigator)
 }
 
 @Preview(showBackground = true)
 @Composable
-fun ProfileSelectScreenPreview(modifier: Modifier = Modifier){
+fun ProfileSelectScreenPreview(modifier: Modifier = Modifier) {
     val previewState = HomeUiState(
         profiles = listOf(Profile("name", true), Profile("name", false)),
 
-    )
-    ProfileSelectScreenContent(homeUiState = previewState, null, modifier)
+        )
+    ProfileSelectScreenContent(homeUiState = previewState)
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ProfileSelectScreenContent(homeUiState: HomeUiState,  navigator : ProfileSelectNavigator? = null, modifier: Modifier = Modifier){
+fun ProfileSelectScreenContent(
+    homeUiState: HomeUiState,
+    modifier: Modifier = Modifier,
+    navigator: ProfileSelectNavigator? = null,
+) {
     val context = LocalContext.current
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier.fillMaxWidth(),
     ) {
-        if(homeUiState.canAddMoreProfiles) {
+
+        Button(
+            onClick = {
+                homeUiState.logout {
+                    navigator?.logout()
+                }
+            },
+            modifier = Modifier.padding(4.dp)
+        ) {
+            Text(text = "Logout")
+        }
+
+        if (homeUiState.canAddMoreProfiles) {
             Button(
                 onClick = { homeUiState.addProfile.invoke("New Profile") },
                 enabled = true,
                 shape = MaterialTheme.shapes.small,
-                modifier = modifier.fillMaxWidth()
+                modifier = modifier
+                    .fillMaxWidth()
+                    .padding(12.dp)
             ) {
                 Text(text = "Add Profile")
             }
-        }else{
+        } else {
             Text(text = "Max Profiles Reached")
         }
-        var uiSelectedProfile by remember { mutableStateOf<Profile?>(null)}
-        Text(modifier = modifier, text = homeUiState.selectedProfile?.profile?.name ?: "No profile selected")
+        var uiSelectedProfile by remember { mutableStateOf<Profile?>(null) }
         ProfilesList(
             uiSelectedProfile = uiSelectedProfile,
             itemList = homeUiState.profiles,
@@ -101,22 +120,25 @@ fun ProfileSelectScreenContent(homeUiState: HomeUiState,  navigator : ProfileSel
             modifier = Modifier
         )
         Spacer(modifier = Modifier.weight(1f))
-        uiSelectedProfile?.let{ uiSelected ->
-            Row(modifier = Modifier
-                .padding(4.dp)
-                .padding(12.dp)) {
+        uiSelectedProfile?.let { uiSelected ->
+            Row(
+                modifier = Modifier
+                    .padding(4.dp)
+                    .padding(12.dp)
+            ) {
                 Button(
                     interactionSource = LongPressButtonInteraction(
                         onShortPress = {
-                            Toast.makeText(context, "Long click to delete", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, "Long click to delete", Toast.LENGTH_SHORT)
+                                .show()
                         },
                         onLongPress = {
-                        homeUiState.deleteProfile(uiSelected)
-                        uiSelectedProfile = null
-                    }),
+                            homeUiState.deleteProfile(uiSelected)
+                            uiSelectedProfile = null
+                        }),
                     onClick = {},
                     modifier = Modifier.padding(4.dp)
-                ){
+                ) {
                     Text(text = "Delete Profile")
                 }
 
@@ -125,7 +147,7 @@ fun ProfileSelectScreenContent(homeUiState: HomeUiState,  navigator : ProfileSel
                     onClick = {
                         homeUiState.selectProfile(uiSelected)
                         navigator?.home()
-                }) {
+                    }) {
                     Text(text = "Enter Profile")
                 }
             }
@@ -135,8 +157,8 @@ fun ProfileSelectScreenContent(homeUiState: HomeUiState,  navigator : ProfileSel
 
 @Composable
 fun LongPressButtonInteraction(
-    onLongPress : () -> Unit = {},
-    onShortPress : () -> Unit = {}
+    onLongPress: () -> Unit = {},
+    onShortPress: () -> Unit = {}
 ): MutableInteractionSource {
     val interactionSource = remember { MutableInteractionSource() }
     val viewConfiguration = LocalViewConfiguration.current
@@ -176,7 +198,7 @@ private fun ProfilesList(
     ) {
 
         items(items = itemList, key = { it.id }) { item ->
-            val dynamicModifier = if(item.id == uiSelectedProfile?.id) modifier.drawWithContent {
+            val dynamicModifier = if (item.id == uiSelectedProfile?.id) modifier.drawWithContent {
                 drawContent()
                 drawRect(color = highlightColor)
             } else modifier

@@ -2,6 +2,8 @@ package com.example.moviedbapp.ui.login
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
@@ -9,11 +11,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -24,8 +26,9 @@ interface LoginNavigator{
     fun toProfiles()
 }
 @Composable
-fun LoginScreen(navigator : LoginNavigator, modifier: Modifier = Modifier, userViewModel: UserViewModel = viewModel(factory = AppViewModelProvider.Factory)){
-    LoginContent(LoginUiState(),  modifier, navigator)
+fun LoginScreen(navigator : LoginNavigator, modifier: Modifier = Modifier, viewModel: UserViewModel = viewModel(factory = AppViewModelProvider.Factory)){
+    val loginUiState by viewModel.uiStateStateFlow.collectAsState()
+    LoginContent(loginUiState,  modifier, navigator)
 }
 
 @Composable
@@ -38,7 +41,9 @@ fun PreviewLoginScreen(modifier: Modifier = Modifier){
 fun LoginContent(loginUiState: LoginUiState, modifier: Modifier = Modifier,  navigator : LoginNavigator? = null){
     var email by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
-
+    if(loginUiState.hasUser){
+        navigator?.toProfiles()
+    }
     Column(
         modifier = modifier.padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -57,14 +62,29 @@ fun LoginContent(loginUiState: LoginUiState, modifier: Modifier = Modifier,  nav
             label = { Text("Password") },
             modifier = Modifier.fillMaxWidth()
         )
-        Button(
-            onClick = {
-                loginUiState.onLoginClick(email, password)
-                navigator?.toProfiles()
-            },
-            modifier = Modifier.align(Alignment.End)
-        ) {
-            Text(text = "Login")
+        Row(){
+            Button(
+                onClick = {
+                    loginUiState.onCreateAccountClick(email,password){
+                        navigator?.toProfiles()
+                    }
+                },
+                modifier = modifier
+            ) {
+                Text(text = "Create Account")
+            }
+            Spacer(modifier = modifier.weight(1f))
+            Button(
+                onClick = {
+                    loginUiState.onLoginClick(email, password){
+                        navigator?.toProfiles()
+                    }
+                },
+                modifier = modifier
+            ) {
+                Text(text = "Login")
+            }
         }
+
     }
 }

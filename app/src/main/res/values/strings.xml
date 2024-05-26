@@ -4,4 +4,5 @@
     <string name="profileSelectTitle">Select Profile</string>
     <string name="homeTitle">Home</string>
     <string name="notFound">Not Found</string>
+    <string name="generic_error">Sorry, try again later.</string>
 </resources>

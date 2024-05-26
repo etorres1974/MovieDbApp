@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.moviedbapp.domain.ProfileRepository
 import com.example.moviedbapp.data.room.Profile
 import com.example.moviedbapp.data.room.ProfileAndWatchList
+import com.example.moviedbapp.domain.UserRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -12,7 +13,8 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class ProfileViewModel(
-    private val profileRepository: ProfileRepository
+    private val profileRepository: ProfileRepository,
+    private val userRepository: UserRepository
 ) : ViewModel() {
 
     private val combineFlow = combine(
@@ -25,7 +27,8 @@ class ProfileViewModel(
             canAddMoreProfiles = allProfiles.size < 4,
             addProfile = ::addProfile,
             selectProfile = ::selectProfile,
-            deleteProfile =  ::deleteProfile
+            deleteProfile =  ::deleteProfile,
+            logout = ::logout
         )
     }
 
@@ -54,6 +57,13 @@ class ProfileViewModel(
         }
     }
 
+    private fun logout(onSuccess : () -> Unit){
+        viewModelScope.launch {
+            userRepository.logout()
+            onSuccess()
+        }
+    }
+
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
     }
@@ -65,5 +75,6 @@ data class HomeUiState(
     val canAddMoreProfiles : Boolean = true,
     val addProfile: (String) -> Unit = {},
     val selectProfile: (Profile) -> Unit = {},
-    val deleteProfile : (Profile) -> Unit = {}
+    val deleteProfile : (Profile) -> Unit = {},
+    val logout : (() -> Unit) -> Unit = {}
 )
