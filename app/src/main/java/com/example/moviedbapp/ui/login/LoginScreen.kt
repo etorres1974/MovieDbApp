@@ -22,26 +22,34 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.moviedbapp.ui.application.AppViewModelProvider
 
-interface LoginNavigator{
+interface LoginNavigator {
     fun toProfiles()
 }
+
 @Composable
-fun LoginScreen(navigator : LoginNavigator, modifier: Modifier = Modifier, viewModel: UserViewModel = viewModel(factory = AppViewModelProvider.Factory)){
+fun LoginScreen(
+    navigator: LoginNavigator,
+    modifier: Modifier = Modifier,
+    viewModel: UserViewModel = viewModel(factory = AppViewModelProvider.Factory)
+) {
     val loginUiState by viewModel.uiStateStateFlow.collectAsState()
-    LoginContent(loginUiState,  modifier, navigator)
+    LoginContent(loginUiState, modifier, navigator)
 }
 
 @Composable
 @Preview(showBackground = true)
-fun PreviewLoginScreen(modifier: Modifier = Modifier){
+fun PreviewLoginScreen(modifier: Modifier = Modifier) {
     LoginContent(LoginUiState(), modifier, null)
 }
 
 @Composable
-fun LoginContent(loginUiState: LoginUiState, modifier: Modifier = Modifier,  navigator : LoginNavigator? = null){
-    var email by rememberSaveable { mutableStateOf("") }
-    var password by rememberSaveable { mutableStateOf("") }
-    if(loginUiState.hasUser){
+fun LoginContent(
+    loginUiState: LoginUiState,
+    modifier: Modifier = Modifier,
+    navigator: LoginNavigator? = null
+) {
+
+    if (loginUiState.hasUser) {
         navigator?.toProfiles()
     }
     Column(
@@ -50,22 +58,22 @@ fun LoginContent(loginUiState: LoginUiState, modifier: Modifier = Modifier,  nav
     ) {
 
         OutlinedTextField(
-            value = email,
-            onValueChange = { email = it },
+            value = loginUiState.inputState.value.email,
+            onValueChange = { loginUiState.actions?.onEmailChanged(it) },
             label = { Text("Email") },
             modifier = Modifier.fillMaxWidth()
         )
 
         OutlinedTextField(
-            value = password,
-            onValueChange = { password = it },
+            value = loginUiState.inputState.value.pass,
+            onValueChange = { loginUiState.actions?.onPassChanged(it) },
             label = { Text("Password") },
             modifier = Modifier.fillMaxWidth()
         )
-        Row(){
+        Row {
             Button(
                 onClick = {
-                    loginUiState.onCreateAccountClick(email,password){
+                    loginUiState.actions?.onCreateAccountClick{
                         navigator?.toProfiles()
                     }
                 },
@@ -76,7 +84,7 @@ fun LoginContent(loginUiState: LoginUiState, modifier: Modifier = Modifier,  nav
             Spacer(modifier = modifier.weight(1f))
             Button(
                 onClick = {
-                    loginUiState.onLoginClick(email, password){
+                    loginUiState.actions?.onLoginClick {
                         navigator?.toProfiles()
                     }
                 },

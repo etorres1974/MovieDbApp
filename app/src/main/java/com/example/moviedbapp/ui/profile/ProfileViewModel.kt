@@ -1,5 +1,7 @@
 package com.example.moviedbapp.ui.profile
 
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.moviedbapp.domain.ProfileRepository
@@ -15,66 +17,80 @@ import kotlinx.coroutines.launch
 class ProfileViewModel(
     private val profileRepository: ProfileRepository,
     private val userRepository: UserRepository
-) : ViewModel() {
+) : ViewModel(), ProfileSelectScreenActions {
+
+    private var inputState = mutableStateOf(ProfileSelectInputState())
+
+    override fun onProfileNameChanged(newValue : String){
+        inputState.value = inputState.value.copy(
+            profileName = newValue
+        )
+    }
 
     private val combineFlow = combine(
         profileRepository.allProfiles,
         profileRepository.selectedProfile
     ) { allProfiles, selectedProfile ->
-        HomeUiState(
+        ProfileUiState(
+            inputState = inputState,
             selectedProfile = selectedProfile.firstOrNull(),
             profiles = allProfiles,
             canAddMoreProfiles = allProfiles.size < 4,
-            addProfile = ::addProfile,
-            selectProfile = ::selectProfile,
-            deleteProfile =  ::deleteProfile,
-            logout = ::logout
+            actions = this
         )
     }
 
-    val homeUiStateStateFlow: StateFlow<HomeUiState> = combineFlow
+    val profileUiStateStateFlow: StateFlow<ProfileUiState> = combineFlow
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-            initialValue = HomeUiState()
+            initialValue = ProfileUiState(actions = this)
         )
 
-    private fun addProfile(profileName : String) {
+    override fun addProfile(profileName : String) {
         viewModelScope.launch {
-            profileRepository.addProfile("Profile Name")
+            profileRepository.addProfile(inputState.value.profileName)
         }
     }
 
-    private fun selectProfile(profile: Profile) {
+    override fun selectProfile(profile: Profile) {
         viewModelScope.launch {
             profileRepository.selectProfile(profile)
         }
     }
 
-    private fun deleteProfile(profile: Profile){
+    override fun deleteProfile(profile: Profile){
         viewModelScope.launch {
             profileRepository.deleteProfile(profile)
         }
     }
 
-    private fun logout(onSuccess : () -> Unit){
+    override fun logout(onSuccess : () -> Unit){
         viewModelScope.launch {
             userRepository.logout()
             onSuccess()
         }
     }
-
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
     }
 }
-
-data class HomeUiState(
+data class ProfileSelectInputState(
+    val profileName : String = ""
+)
+data class ProfileUiState(
+    val inputState: MutableState<ProfileSelectInputState> = mutableStateOf(ProfileSelectInputState()),
     val selectedProfile: ProfileAndWatchList? = null,
     val profiles: List<Profile> = listOf(),
     val canAddMoreProfiles : Boolean = true,
-    val addProfile: (String) -> Unit = {},
-    val selectProfile: (Profile) -> Unit = {},
-    val deleteProfile : (Profile) -> Unit = {},
-    val logout : (() -> Unit) -> Unit = {}
-)
+    val actions : ProfileSelectScreenActions
+) : ProfileSelectScreenActions by actions
+interface ProfileSelectScreenActions{
+    fun onProfileNameChanged(newValue : String)
+    fun addProfile(name : String)
+    fun selectProfile(profile : Profile)
+    fun deleteProfile(profile: Profile)
+    fun logout(onSuccess : () -> Unit)
+}
+
+

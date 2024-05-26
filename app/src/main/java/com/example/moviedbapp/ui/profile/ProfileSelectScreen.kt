@@ -23,6 +23,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -44,8 +45,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.moviedbapp.R
 import com.example.moviedbapp.data.room.Profile
 import com.example.moviedbapp.ui.application.AppViewModelProvider
-import com.example.moviedbapp.ui.login.UserViewModel
-import com.google.firebase.firestore.auth.User
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 
@@ -60,24 +59,30 @@ fun ProfileSelectScreen(
     modifier: Modifier = Modifier,
     viewModel: ProfileViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
-    val homeUiState by viewModel.homeUiStateStateFlow.collectAsState()
-    ProfileSelectScreenContent(homeUiState = homeUiState, modifier, navigator)
+    val homeUiState by viewModel.profileUiStateStateFlow.collectAsState()
+    ProfileSelectScreenContent(profileUiState = homeUiState, modifier, navigator)
 }
 
 @Preview(showBackground = true)
 @Composable
 fun ProfileSelectScreenPreview(modifier: Modifier = Modifier) {
-    val previewState = HomeUiState(
+    val previewState = ProfileUiState(
         profiles = listOf(Profile("name", true), Profile("name", false)),
-
-        )
-    ProfileSelectScreenContent(homeUiState = previewState)
+        actions = object : ProfileSelectScreenActions {
+            override fun onProfileNameChanged(newValue: String) {}
+            override fun addProfile(name: String) {}
+            override fun selectProfile(profile: Profile) {}
+            override fun deleteProfile(profile: Profile) {}
+            override fun logout(onSuccess: () -> Unit) {}
+        }
+    )
+    ProfileSelectScreenContent(profileUiState = previewState)
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ProfileSelectScreenContent(
-    homeUiState: HomeUiState,
+    profileUiState: ProfileUiState,
     modifier: Modifier = Modifier,
     navigator: ProfileSelectNavigator? = null,
 ) {
@@ -89,7 +94,7 @@ fun ProfileSelectScreenContent(
 
         Button(
             onClick = {
-                homeUiState.logout {
+                profileUiState.logout {
                     navigator?.logout()
                 }
             },
@@ -97,10 +102,16 @@ fun ProfileSelectScreenContent(
         ) {
             Text(text = "Logout")
         }
-
-        if (homeUiState.canAddMoreProfiles) {
+        val profileName by profileUiState.inputState
+        if (profileUiState.canAddMoreProfiles) {
+            OutlinedTextField(
+                value = profileName.profileName,
+                onValueChange = { profileUiState.onProfileNameChanged(it)},
+                label = { Text("New Profile Name") },
+                modifier = Modifier.fillMaxWidth()
+            )
             Button(
-                onClick = { homeUiState.addProfile.invoke("New Profile") },
+                onClick = { profileUiState.addProfile("New Profile") },
                 enabled = true,
                 shape = MaterialTheme.shapes.small,
                 modifier = modifier
@@ -115,7 +126,7 @@ fun ProfileSelectScreenContent(
         var uiSelectedProfile by remember { mutableStateOf<Profile?>(null) }
         ProfilesList(
             uiSelectedProfile = uiSelectedProfile,
-            itemList = homeUiState.profiles,
+            itemList = profileUiState.profiles,
             onItemClick = { uiSelectedProfile = it },
             modifier = Modifier
         )
@@ -133,7 +144,7 @@ fun ProfileSelectScreenContent(
                                 .show()
                         },
                         onLongPress = {
-                            homeUiState.deleteProfile(uiSelected)
+                            profileUiState.deleteProfile(uiSelected)
                             uiSelectedProfile = null
                         }),
                     onClick = {},
@@ -145,7 +156,7 @@ fun ProfileSelectScreenContent(
                 Button(
                     modifier = Modifier.padding(4.dp),
                     onClick = {
-                        homeUiState.selectProfile(uiSelected)
+                        profileUiState.selectProfile(uiSelected)
                         navigator?.home()
                     }) {
                     Text(text = "Enter Profile")
