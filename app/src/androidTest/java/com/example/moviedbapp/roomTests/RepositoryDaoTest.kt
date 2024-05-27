@@ -71,7 +71,7 @@ class RepositoryDaoTest {
         profileRepository.selectProfile(profile)
 
         assert(profileRepository.selectedProfile.first().first().watchList.isEmpty())
-        val movie = Movie("_")
+        val movie = Movie("_", 0, poster = "_")
         movieDao.insert(movie)
         profileRepository.addMovieToWatchList(movie)
         assert(profileRepository.selectedProfile.first().first().watchList.isNotEmpty())

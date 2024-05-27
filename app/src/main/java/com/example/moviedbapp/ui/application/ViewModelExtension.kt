@@ -8,13 +8,14 @@ import com.example.moviedbapp.R
 import com.example.moviedbapp.ui.application.SnackbarMessage.Companion.toSnackbarMessage
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 
-fun ViewModel.launchCatching(snackbar: Boolean = true, block: suspend CoroutineScope.() -> Unit) =
+fun ViewModel.launchCatching(snackbar: Boolean = true, block: suspend CoroutineScope.() -> Unit ) =
     viewModelScope.launch(
         CoroutineExceptionHandler { _, throwable ->
             if (snackbar) {

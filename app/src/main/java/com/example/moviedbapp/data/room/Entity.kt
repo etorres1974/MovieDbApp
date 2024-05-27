@@ -17,7 +17,9 @@ data class Profile(
 @Entity(tableName = "movie")
 data class Movie(
     val name: String,
-    @PrimaryKey val id: UUID = UUID.randomUUID(),
+    @PrimaryKey val movieDbId : Int,
+    val id: UUID = UUID.randomUUID(),
+    val poster : String,
 )
 @Entity(
     tableName = "watchItem",
@@ -27,13 +29,13 @@ data class Movie(
         childColumns = arrayOf("profileId")
     ), ForeignKey(
         entity = Movie::class,
-        parentColumns = arrayOf("id"),
-        childColumns = arrayOf("movieId")
+        parentColumns = arrayOf("movieDbId"),
+        childColumns = arrayOf("movieDbId")
     )]
 )
 data class WatchItem(
     val profileId : UUID,
-    val movieId: UUID,
+    val movieDbId: Int,
     @PrimaryKey val id: UUID = UUID.randomUUID(),
 )
 

@@ -34,7 +34,7 @@ class ProfileRepoImplementation(
     override suspend fun addMovieToWatchList(movie : Movie) {
         withContext(dispatcher) {
             val profileId = profileDao.getSelected().first().id
-            watchItemDao.insert(WatchItem(profileId, movie.id))
+            watchItemDao.insert(WatchItem(profileId, movieDbId = movie.movieDbId))
         }
     }
 

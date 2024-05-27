@@ -23,15 +23,18 @@ interface AppContainer {
 class AppDataContainer(private val context: Context) : AppContainer {
     private val db = AppDatabase.getInstance(context)
     private val retrofit = getRetrofitInstance()
+    private val profileDao = db.profileDao()
+    private val watchItemDao = db.watchItemDao()
+    private val movieDao = db.movieDao()
     override val movieDbApiService: MovieDbApiService by lazy { retrofit.create(MovieDbApiService::class.java) }
 
     override val profileRepository: ProfileRepository by lazy {
-        ProfileRepoImplementation(db.watchItemDao(), db.profileDao())
+        ProfileRepoImplementation(watchItemDao, profileDao)
     }
     override val userRepository: UserRepository by lazy {
         FirebaseUserRepoImp(Firebase.auth)
     }
     override val movieRepository : MovieRepository by lazy {
-        MovieRepoImpl(movieDbApiService)
+        MovieRepoImpl(movieDao, profileDao, watchItemDao, movieDbApiService)
     }
 }

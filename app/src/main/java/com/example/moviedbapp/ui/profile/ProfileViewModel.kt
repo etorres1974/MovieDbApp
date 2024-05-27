@@ -8,6 +8,7 @@ import com.example.moviedbapp.domain.ProfileRepository
 import com.example.moviedbapp.data.room.Profile
 import com.example.moviedbapp.data.room.ProfileAndWatchList
 import com.example.moviedbapp.domain.UserRepository
+import com.example.moviedbapp.ui.application.launchCatching
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -48,7 +49,7 @@ class ProfileViewModel(
         )
 
     override fun addProfile(profileName : String) {
-        viewModelScope.launch {
+        launchCatching {
             profileRepository.addProfile(inputState.value.profileName)
         }
     }

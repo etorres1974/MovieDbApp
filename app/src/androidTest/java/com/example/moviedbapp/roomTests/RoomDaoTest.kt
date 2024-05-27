@@ -74,11 +74,10 @@ class RoomDaoTest {
         assertThrows(SQLiteConstraintException::class.java){
             runBlocking {
                 val profile = Profile("_")
-                val movie = Movie("_")
-                val randomMovieId = UUID.randomUUID()
+                val movie = Movie("_", 0 , poster = "_")
                 profileDao.insert(profile)
                 movieDao.insert(movie)
-                watchItemDao.insert(WatchItem(profile.id, randomMovieId))
+                watchItemDao.insert(WatchItem(profile.id, 1))
             }
         }
     }
@@ -88,11 +87,11 @@ class RoomDaoTest {
         assertThrows(SQLiteConstraintException::class.java){
             runBlocking{
                 val profile = Profile("_")
-                val movie = Movie("_")
+                val movie = Movie("_",0, poster = "_")
                 val randomProfileId = UUID.randomUUID()
                 profileDao.insert(profile)
                 movieDao.insert(movie)
-                watchItemDao.insert(WatchItem(randomProfileId,movie.id,))
+                watchItemDao.insert(WatchItem(randomProfileId,movie.movieDbId,))
             }
         }
     }
@@ -101,12 +100,12 @@ class RoomDaoTest {
     @Throws(Exception::class)
     fun write_watchItem_and_read_in_list() = runBlocking{
         var profile = Profile("_")
-        var movie = Movie("_")
+        var movie = Movie("_",0, poster = "_")
         profileDao.insert(profile)
         movieDao.insert(movie)
         val initialState = watchItemDao.getAllWatchItens().first()
         assert(initialState.isEmpty())
-        val watchItem = (WatchItem(profile.id, movie.id))
+        val watchItem = (WatchItem(profile.id, movie.movieDbId))
         watchItemDao.insert(watchItem)
         val results = watchItemDao.getById(watchItem.id)
         assertThat(results.firstOrNull()?.id, equalTo(watchItem.id))
@@ -116,10 +115,10 @@ class RoomDaoTest {
     @Throws(Exception::class)
     fun add_watch_item_to_profile_and_return_in_list() = runTest{
         val newProfile = Profile("_")
-        val movie = Movie("_")
+        val movie = Movie("_", 0, poster = "_")
         profileDao.insert(newProfile)
         movieDao.insert(movie)
-        val newWatchItem = WatchItem(newProfile.id, movie.id)
+        val newWatchItem = WatchItem(newProfile.id, movie.movieDbId)
         watchItemDao.insert(newWatchItem)
 
         val results = profileDao.getFullProfileById(newProfile.id)

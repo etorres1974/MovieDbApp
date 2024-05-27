@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Transaction
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import java.util.UUID
 
 @Dao
@@ -13,10 +14,14 @@ abstract class ProfileDao : BaseDao<Profile>{
     abstract fun getAll() : Flow<List<Profile>>
 
     @Query("Select * FROM profile where selected = true")
-    abstract fun getSelected() : List<Profile>
+    abstract suspend fun getSelected() : List<Profile>
     @Transaction
     @Query("Select * FROM profile  where selected = true")
     abstract fun getSelectedFullProfile() : Flow<List<ProfileAndWatchList>>
+
+    @Transaction
+    @Query("Select * FROM profile  where selected = true")
+    abstract fun getSelectedFullProfileList() : List<ProfileAndWatchList>
 
     @Query("Select * FROM profile WHERE id = :id")
     abstract fun getById(id : UUID) : List<Profile>
@@ -35,7 +40,6 @@ suspend inline fun ProfileDao.selectProfile(profile : Profile) {
     profile.selected = true
     update(profile)
 }
-
 @Dao
 abstract class WatchItemDao : BaseDao<WatchItem>{
     @Query("SELECT * FROM  watchItem")
@@ -49,4 +53,7 @@ abstract class WatchItemDao : BaseDao<WatchItem>{
 abstract class MovieDao : BaseDao<Movie>{
     @Query("SELECT * FROM movie")
     abstract fun getAll() : Flow<List<Movie>>
+
+    @Query("Select * FROM movie WHERE id IN(:ids)")
+    abstract fun getAllByIds(ids : List<Int>) : List<Movie>
 }

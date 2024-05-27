@@ -1,17 +1,21 @@
 package com.example.moviedbapp.ui.home
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.moviedbapp.domain.Movie
 import com.example.moviedbapp.ui.application.AppViewModelProvider
 import com.example.moviedbapp.ui.movie.MovieList
-import com.example.moviedbapp.ui.profile.ProfileViewModel
 
 interface HomeNavigator{
     fun selectProfileScreen()
@@ -32,14 +36,29 @@ fun HomeScreenPreview(modifier: Modifier = Modifier){
         Movie(3, title = "Cccc")
     )
     val uiState = MovieUiState(
-        movies = movies
+        discoverMovies = movies
     )
     HomeScreenContent(navigator = null, modifier = modifier, uiState)
 }
 @Composable
 fun HomeScreenContent(navigator : HomeNavigator?, modifier: Modifier = Modifier,  moviesUiState: MovieUiState){
+
+    val movieMode by moviesUiState.mode
     Column(modifier) {
-        Text(text = "Home Screen")
-        MovieList(movies = moviesUiState.movies)
+        Button(
+            modifier = Modifier.fillMaxWidth().padding(12.dp),
+            onClick = { moviesUiState.actions?.toggleMovieListMode() }) {
+            when(movieMode){
+                MovieListMode.Discover ->{
+                    Text(text = "Show MyWishlist")
+                }
+                MovieListMode.Wishlist ->{
+                    Text(text = "Show Discover")
+                }
+            }
+        }
+
+
+        MovieList(moviesUiState = moviesUiState)
     }
 }
